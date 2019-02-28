@@ -460,9 +460,19 @@ func wrapBus(obj *glib.Object) *Bus {
 	return &Bus{Object{glib.InitiallyUnowned{obj}}}
 }
 
-// AddSignalWatch() is a wrapper around gst_bus_add_signal_watch().
+// AddSignalWatch is a wrapper around gst_bus_add_signal_watch().
 func (v *Bus) AddSignalWatch() {
 	C.gst_bus_add_signal_watch(v.native())
+}
+
+// EnableSyncMessageEmission is a wrapper around gst_bus_enable_sync_message_emission().
+func (v *Bus) EnableSyncMessageEmission() {
+	C.gst_bus_enable_sync_message_emission(v.native())
+}
+
+// DisableSyncMessageEmission is a wrapper around gst_bus_disable_sync_message_emission().
+func (v *Bus) DisableSyncMessageEmission() {
+	C.gst_bus_disable_sync_message_emission(v.native())
 }
 
 /*
@@ -731,6 +741,12 @@ func (v *Message) Native() uintptr {
 func marshalMessage(p uintptr) (interface{}, error) {
 	c := C.g_value_get_boxed((*C.GValue)(unsafe.Pointer(p)))
 	return &Message{(*C.GstMessage)(unsafe.Pointer(c))}, nil
+}
+
+// GetSource returns the Gst.Object that originated this message
+func (v *Message) GetSource() (*Object, error) {
+	obj := &glib.Object{glib.ToGObject(unsafe.Pointer(v.GstMessage.src))}
+	return wrapObject(obj), nil
 }
 
 // GetSourceName() is a wrapper around GST_MESSAGE_SRC_NAME().
